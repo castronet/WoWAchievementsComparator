@@ -1,5 +1,6 @@
 <?php
 # vi:si:et:sw=4:sts=4:ts=4
+include("functions.php");
 ?>
 <html>
     <head>
@@ -11,5 +12,15 @@
     </head>
 
     <body>
+Before
+<br />
+<pre>
+<?php
+    dump_json(get_achievements_data());
+?>
+</pre>
+
+<br />
+after
     </body>
 </html>
