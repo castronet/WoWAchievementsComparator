@@ -16,7 +16,9 @@ Before
 <br />
 <pre>
 <?php
-    dump_json(get_achievements_data());
+    $i = 0;
+    $i = dump_json(get_achievements_data());
+	echo "\n kakakkakak $i\n";
 ?>
 </pre>
 
