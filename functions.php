@@ -24,24 +24,44 @@ function get_achievements_data()
 	return $array_data['achievements'];
 }
 
-function dump_json($data)
+function dump_json($data, $parent = null)
 {
 //	print_r($data);
 //	return;
+	$r = 0;
 	$i = 0;
+	$parent_exists = false;
+
+	if (isset($parent) && count($parent) > 0)
+		$parent_exists = true;
+
 	foreach ($data as $c)
 	{
+		$j = 0;
 		if (isset($c['achievements']))
+		{
 			foreach ($c['achievements'] as $a)
 			{
 
 				$i++;
-				printf("\n- Categoria: %s %d-%s (%d): %s", $c['name'], $a['id'], $a['title'], $a['points'], $a['description']);
+				$j++;
+				if ($parent_exists)
+					printf("\n%d - PareCategoria: %s | Categoria: %s %d-%s (%d): %s", $i, $parent['name'], $c['name'], $a['id'], $a['title'], $a['points'], $a['description']);
+				else
+					printf("\n%d - Categoria: %s %d-%s (%d): %s", $i, $c['name'], $a['id'], $a['title'], $a['points'], $a['description']);
+
 				print_r($a);
 			}
+		}
 
 		if (isset($c['categories']))
-			$i += dump_json($c['categories']); 
+		{
+			$r = dump_json($c['categories'], array("id" => $c['id'], "name" => $c['name']));
+			$i += $r;
+
+		}
+
+		printf("\nCategoria %d %s resultados: %d\n\n\n", $c['id'], $c['name'], $r+$j);
 	}
 
 	return $i;
