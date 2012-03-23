@@ -32,6 +32,9 @@ function dump_json($data, $parent = null)
 	$i = 0;
 	$parent_exists = false;
 
+	$achievements = array();
+	$achievements_temp = array();
+
 	if (isset($parent) && count($parent) > 0)
 		$parent_exists = true;
 
@@ -46,25 +49,57 @@ function dump_json($data, $parent = null)
 				$i++;
 				$j++;
 				if ($parent_exists)
-					printf("\n%d - PareCategoria: %s | Categoria: %s %d-%s (%d): %s", $i, $parent['name'], $c['name'], $a['id'], $a['title'], $a['points'], $a['description']);
+				{
+//					printf("\n%d - PareCategoria: %s | Categoria: %s %d-%s (%d): %s", $i, $parent['name'], $c['name'], $a['id'], $a['title'], $a['points'], $a['description']);
+					$achievements[] = array_merge($a, array("pid" => $parent['id']));
+				}
 				else
-					printf("\n%d - Categoria: %s %d-%s (%d): %s", $i, $c['name'], $a['id'], $a['title'], $a['points'], $a['description']);
+				{
+//					printf("\n%d - Categoria: %s %d-%s (%d): %s", $i, $c['name'], $a['id'], $a['title'], $a['points'], $a['description']);
+					$achievements[] = array_merge($a, array("pid" => intval("-1")));
+				}
 
-				print_r($a);
+//				print_r($a);
 			}
 		}
 
 		if (isset($c['categories']))
 		{
-			$r = dump_json($c['categories'], array("id" => $c['id'], "name" => $c['name']));
-			$i += $r;
-
+			$achievements_temp = dump_json($c['categories'], array("id" => $c['id'], "name" => $c['name']));
+			$achievements = array_merge($achievements, $achievements_temp);
+			unset($achievements_temp);
 		}
 
-		printf("\nCategoria %d %s resultados: %d\n\n\n", $c['id'], $c['name'], $r+$j);
+		printf("Categoria '%s': %d\n", $c['name'], $r+$j);
 	}
 
-	return $i;
+	return $achievements;
+}
+
+function look_for_title(&$a, $t)
+{
+	foreach ($a as $i)
+		if ($i['title'] == $t)
+			return true;
+
+
+	return false;
+}
+
+function clean_dups($list)
+{
+	$n = array();
+
+	foreach ($list as $a)
+	{
+		$b = look_for_title(&$n, $a['title']);
+		if ($b > 0)
+			$n[$b] = $a;
+		else
+			$n[] = $a;
+	}
+
+	return $n;
 }
 
 function create_wac_database($data)
